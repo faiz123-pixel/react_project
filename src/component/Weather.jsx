@@ -18,7 +18,6 @@ function Weather() {
 
   // ✅ Function to choose video based on weather
   const getVideo = (description) => {
-    console.log("Weather Description →", description);
     if (!description) return video2;
 
     const desc = description.toLowerCase();
@@ -60,7 +59,7 @@ function Weather() {
     )
       .then((res) => res.json())
       .then((data) => {
-        console.log("Forecast =>", data.data);
+        // console.log("Forecast =>", data.data);
         setForecast(data.data);
       })
       .catch(() => setError("Forecast unavailable."))
@@ -78,7 +77,6 @@ function Weather() {
   return (
     <>
       <div className="video-container">
-        {/* ✅ Force video reload using key */}
         <video
           key={getVideo(data?.weather?.description)}
           autoPlay
@@ -89,102 +87,60 @@ function Weather() {
           <source src={getVideo(data?.weather?.description)} type="video/mp4" />
         </video>
 
-        <div className="content" style={{ height: "100vh" }}>
-          <div style={{ display: "flex", justifyContent: "space-evenly" }}>
-            <h1 className="text-center m-2">Weather Dashboard</h1>
-
+        <div className="content">
+          {/* Header */}
+          <div className="header-box">
+            <h2 style={{ margin: 0, color: "#fff" }}>Weather App</h2>
             <input
-              className="m-3 w-50"
-              style={{ borderRadius: "10px", height: "40px" }}
+              className="city-input"
               type="text"
               value={inputCity}
-              placeholder="Enter city"
+              placeholder="Enter city..."
               onChange={(e) => setInputCity(e.target.value)}
             />
-
-            <button className="btn btn-primary m-3" onClick={handleCity}>
+            <button className="search-btn" onClick={handleCity}>
               Search
             </button>
           </div>
 
-          <div
-            style={{
-              border: "2px solid black",
-              width: "400px",
-              marginLeft: "200px",
-            }}
-          >
-            <div>
-              {loading && (
-                <p style={{ color: "blue", textAlign: "center" }}>
-                  Loading weather data...
-                </p>
-              )}
+          {/* Main Weather Card */}
+          <div className="weather-box">
+            {loading && <p style={{ color: "yellow" }}>Loading...</p>}
+            {error && <p style={{ color: "red" }}>{error}</p>}
 
-              {error && (
-                <p
-                  style={{
-                    color: "red",
-                    textAlign: "center",
-                    fontWeight: "bold",
-                  }}
-                >
-                  {error}
-                </p>
-              )}
+            {data && !loading && (
+              <>
+                <h2>{data.city_name}</h2>
+                <hr style={{ borderColor: "white" }} />
 
-              {data && !loading && (
                 <div
-                  className="text-center pb-3"
-                  style={{ fontWeight: "bold" }}
+                  style={{ display: "flex", justifyContent: "space-between" }}
                 >
-                  <h2>{data.city_name}</h2>
-
-                  <div
-                    style={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                    }}
-                  >
-                    <div>
-                      <p>🌡 Temp: {data.temp} °C</p>
-                      <p>🌡 Feels: {data.app_temp} °C</p>
-                    </div>
-
-                    <div>
-                      <p>{data.weather.description}</p>
-                      <p>💨 Wind: {data.wind_spd} m/s</p>
-                      <p>💧 Humidity: {data.rh} %</p>
-                    </div>
+                  <div>
+                    <p className="temp-big">{data.temp}°C</p>
+                    <p>Feels Like: {data.app_temp}°C</p>
                   </div>
-                  <div
-                    style={{
-                      display: "flex",
-                      justifyContent: "center",
-                      gap: "20px",
-                    }}
-                  >
-                    {forecast.map((day) => (
-                      <div
-                        key={day.valid_date}
-                        style={{
-                          background: "rgba(255,255,255,0.2)",
-                          padding: "15px",
-                          borderRadius: "10px",
-                          width: "120px",
-                          color: "black",
-                        }}
-                      >
-                        <h5>{day.valid_date}</h5>
-                        <p>{day.weather.description}</p>
-                        <p>🌡 {day.temp} °C</p>
-                        <p>💧 {day.rh}%</p>
-                      </div>
-                    ))}
+
+                  <div>
+                    <p>{data.weather.description}</p>
+                    <p>💨 Wind: {data.wind_spd} m/s</p>
+                    <p>💧 Humidity: {data.rh}%</p>
                   </div>
                 </div>
-              )}
-            </div>
+
+                {/* Forecast Grid */}
+                <div className="forecast-container">
+                  {forecast.map((day) => (
+                    <div key={day.valid_date} className="forecast-card">
+                      <p className="date-text">{day.valid_date}</p>
+                      <p>{day.weather.description}</p>
+                      <p>{day.temp}°C</p>
+                      <p>💧 {day.rh}%</p>
+                    </div>
+                  ))}
+                </div>
+              </>
+            )}
           </div>
         </div>
       </div>
